@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Brain Over Board | Chess + AI Training Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1a1a3a 0, #050510 45%, #000 100%);
+      color: #f5f5ff;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .glow {
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(
+        to right,
+        rgba(5, 5, 25, 0.92),
+        rgba(5, 5, 35, 0.9)
+      );
+      border-bottom: 1px solid rgba(0, 255, 255, 0.25);
+    }
+
+    .nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 0 12px rgba(0, 255, 180, 0.6);
+    }
+
+    .logo span:nth-child(2) {
+      color: #00ffe0;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    nav a {
+      position: relative;
+      padding-bottom: 0.15rem;
+      opacity: 0.8;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #00ffe0, #7b5cff);
+      transition: width 0.2s ease;
+    }
+
+    nav a:hover {
+      opacity: 1;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 3.5rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: center;
+      padding: 2rem;
+      border-radius: 24px;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      background: radial-gradient(circle at top left, #111133 0, #050515 55%);
+      box-shadow: 0 0 35px rgba(0, 255, 255, 0.25);
+      margin-top: 1.8rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      background: rgba(0, 0, 20, 0.8);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+      opacity: 0.9;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 3vw, 2.75rem);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero h1 span {
+      color: #00ffe0;
+    }
+
+    .hero-sub {
+      font-size: 0.98rem;
+      color: #dadcf8;
+      max-width: 32rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-sub strong {
+      color: #ffffff;
+    }
+
+    .hero-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .pill {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 92, 255, 0.6);
+      background: rgba(5, 5, 35, 0.9);
+      opacity: 0.9;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.65rem 1.4rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.12s ease, border-color 0.12s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top left, #00ffe0 0, #7b5cff 60%);
+      color: #050512;
+      font-weight: 600;
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.65);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 0 26px rgba(0, 255, 255, 0.9);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: rgba(0, 255, 255, 0.35);
+      color: #e4e5ff;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(0, 10, 25, 0.85);
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px rgba(123, 92, 255, 0.75);
+    }
+
+    .hero-note {
+      font-size: 0.75rem;
+      color: #a9acd9;
+      margin-top: 0.8rem;
+    }
+
+    .hero-right {
+      position: relative;
+      border-radius: 20px;
+      padding: 1.3rem;
+      background: radial-gradient(circle at top, #121243 0, #050515 60%);
+      border: 1px solid rgba(0, 255, 255, 0.35);
+      box-shadow: 0 0 26px rgba(0, 255, 255, 0.2);
+      overflow: hidden;
+    }
+
+    .hero-right::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      opacity: 0.12;
+      background-image: radial-gradient(circle at 1px 1px, #00ffe0 1px, transparent 0);
+      background-size: 20px 20px;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .yt-tag {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      opacity: 0.8;
+      margin-bottom: 0.6rem;
+    }
+
+    .screen {
+      position: relative;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 255, 255, 0.45);
+      padding: 1rem;
+      background: linear-gradient(135deg, #04040a, #151538);
+      margin-bottom: 1rem;
+      box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.15);
+    }
+
+    .screen-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .screen-title {
+      font-weight: 600;
+    }
+
+    .screen-status {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 255, 0.5);
+    }
+
+    .screen-board {
+      margin-top: 0.8rem;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 2px;
+    }
+
+    .square {
+      padding-top: 100%;
+      position: relative;
+      border-radius: 2px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #17172e, #05050f);
+    }
+
+    .square:nth-child(odd) {
+      background: radial-gradient(circle at top left, #00ffe0 0, #050515 70%);
+      opacity: 0.7;
+    }
+
+    .piece {
+      position: absolute;
+      inset: 25%;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.65);
+      background: radial-gradient(circle at top, #ffffff, #b5fdf4);
+    }
+
+    .hero-stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.8rem;
+      font-size: 0.76rem;
+      opacity: 0.9;
+    }
+
+    .hero-stat-row span {
+      display: block;
+    }
+
+    .hero-stat-row span strong {
+      font-size: 0.9rem;
+    }
+
+    section {
+      margin-top: 3.5rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #6be7ff;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-sub {
+      font-size: 0.95rem;
+      color: #c5c7f2;
+      max-width: 40rem;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.7rem;
+      margin-top: 1.5rem;
+    }
+
+    .card {
+      border-radius: 18px;
+      border: 1px solid rgba(0, 255, 255, 0.35);
+      background: radial-gradient(circle at top, #111133 0, #050511 55%);
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.15);
+      padding: 1.2rem 1.2rem 1.3rem;
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(0, 255, 255, 0.12);
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #00ffe0;
+    }
+
+    .card h3 {
+      font-size: 1.12rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #d2d4ff;
+      margin-bottom: 0.65rem;
+    }
+
+    .list {
+      list-style: none;
+      font-size: 0.86rem;
+      color: #c7c9f5;
+      margin-bottom: 0.8rem;
+    }
+
+    .list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .list li::before {
+      content: "►";
+      font-size: 0.6rem;
+      margin-top: 0.15rem;
+      color: #00ffe0;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .meta {
+      font-size: 0.75rem;
+      color: #a9acd9;
+    }
+
+    .btn-small {
+      padding: 0.5rem 1.2rem;
+      font-size: 0.82rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 255, 0.6);
+      background: radial-gradient(circle at top left, #00ffe0 0, #7b5cff 60%);
+      color: #040612;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .btn-small:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.8);
+    }
+
+    .ai-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .ai-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+    }
+
+    .ai-pill {
+      font-size: 0.7rem;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(0, 255, 255, 0.12);
+      border: 1px solid rgba(0, 255, 255, 0.4);
+    }
+
+    .ai-note {
+      font-size: 0.8rem;
+      color: #a9acd9;
+      margin-top: 0.6rem;
+      max-width: 40rem;
+    }
+
+    .proof {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 1.8rem;
+      margin-top: 1.8rem;
+      align-items: center;
+    }
+
+    .proof-box {
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 255, 0.35);
+      background: radial-gradient(circle at top, #111133 0, #050515 55%);
+      padding: 1.1rem 1.2rem;
+      font-size: 0.88rem;
+      color: #d4d6ff;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    .proof-list {
+      list-style: none;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .proof-list li {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .proof-list li::before {
+      content: "✔";
+      font-size: 0.75rem;
+      color: #00ffe0;
+      margin-top: 0.1rem;
+    }
+
+    .proof-metric-box {
+      border-radius: 12px;
+      padding: 0.75rem 0.9rem;
+      border: 1px dashed rgba(0, 255, 255, 0.5);
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: #a9acd9;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.6rem;
+      margin-top: 1.6rem;
+      font-size: 0.9rem;
+      color: #d2d4ff;
+    }
+
+    .faq-item h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .contact-card {
+      margin-top: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      background: radial-gradient(circle at top, #111132 0, #050514 60%);
+      padding: 1.1rem 1.3rem;
+      font-size: 0.9rem;
+      color: #d4d5ff;
+    }
+
+    footer {
+      border-top: 1px solid rgba(0, 255, 255, 0.25);
+      padding: 1.3rem 1.5rem 1.8rem;
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
+      color: #9698c6;
+      background: radial-gradient(circle at top, #070720 0, #010108 70%);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-inner span {
+      opacity: 0.9;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero {
+        padding: 1.4rem;
+      }
+
+      .proof {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nav {
+        gap: 1.3rem;
+      }
+
+      nav ul {
+        font-size: 0.8rem;
+        gap: 0.8rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-primary,
+      .btn-ghost {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .btn-small {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+
+      .page {
+        padding-inline: 1rem;
+      }
+
+      .nav {
+        padding-inline: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-icon glow">♞</div>
+        <span>Brain</span><span>Over Board</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#videos">Chess Videos</a></li>
+          <li><a href="#ai-tools">AI Tools</a></li>
+          <li><a href="#proof">Results</a></li>
+          <li><a href="#contact">Connect</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- PAGE WRAPPER -->
+  <main class="page">
+    <!-- HERO -->
+    <section id="hero" class="hero">
+      <div>
+        <div class="hero-badge glow">
+          <span>Chess • YouTube • AI Training</span>
+        </div>
+        <h1>
+          Turn chaotic boards into
+          <span class="glow">calculated wins</span>.
+        </h1>
+        <p class="hero-sub">
+          Welcome to <strong>Brain Over Board</strong> — the home base for my
+          YouTube channel, chess lessons, and AI-powered study systems. Learn
+          clear opening principles, master how the pieces move, and see how I
+          use <strong>AI tools</strong> to learn faster and build digital income.
+        </p>
+
+        <div class="hero-grid">
+          <div class="pill">Beginner-friendly lessons</div>
+          <div class="pill">AI-powered training tools</div>
+          <div class="pill">Step-by-step explanations</div>
+          <div class="pill">Built from real games</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#videos" class="btn-primary">
+            Get the Chess Videos – $25 each
+          </a>
+          <a href="#ai-tools" class="btn-ghost">
+            Explore the AI Toolkit
+          </a>
+        </div>
+
+        <p class="hero-note">
+          No hype, no shortcuts — just disciplined study, practical tools, and
+          a system you can actually stick with.
+        </p>
+      </div>
+
+      <aside class="hero-right">
+        <div class="yt-tag glow">Brain Over Board • Channel Snapshot</div>
+        <div class="screen">
+          <div class="screen-row">
+            <span class="screen-title">Live Training Board</span>
+            <span class="screen-status">AI-Assisted</span>
+          </div>
+          <div class="screen-board">
+            <!-- 8x8 micro "futuristic" board -->
+            <!-- Only a few “pieces” for a minimal look -->
+            <div class="square"><div class="piece"></div></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"><div class="piece"></div></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"><div class="piece"></div></div>
+
+            <div class="square"></div>
+            <div class="square"><div class="piece"></div></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"><div class="piece"></div></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"><div class="piece"></div></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"><div class="piece"></div></div>
+            <div class="square"></div>
+            <div class="square"></div>
+
+            <!-- Remaining squares just pattern -->
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+          </div>
+        </div>
+        <div class="hero-stat-row">
+          <span>
+            Channel: <strong>Brain Over Board</strong><br />
+            Mode: Study • Play • Reflect
+          </span>
+          <span>
+            Focus: <strong>Openings & Foundations</strong><br />
+            Engine: Human + AI
+          </span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- CHESS VIDEOS -->
+    <section id="videos">
+      <p class="section-label">Chess Video Library</p>
+      <h2 class="section-title glow">Own the fundamentals, control the board.</h2>
+      <p class="section-sub">
+        These two core lessons were built from my own training and games. Each
+        one is a downloadable video that you can replay, pause, and study on
+        your own time.
+      </p>
+
+      <div class="video-grid">
+        <!-- VIDEO 1 -->
+        <article class="card">
+          <div class="card-header">
+            <span class="tag">Video Lesson</span>
+            <span class="price">$25</span>
+          </div>
+          <h3>The Three Principles of The Chess Opening</h3>
+          <p>
+            Learn the three simple rules that keep you safe in the opening so
+            you don’t get crushed in the first 10 moves.
+          </p>
+          <ul class="list">
+            <li>Understand development, king safety, and central control.</li>
+            <li>See real examples of common beginner mistakes.</li>
+            <li>Get a repeatable opening mindset, not just memorized moves.</li>
+          </ul>
+          <div class="card-footer">
+            <p class="meta">
+              Format: HD video<br />
+              Level: Beginner to early intermediate
+            </p>
+            <!-- Replace # with your real checkout link -->
+            <a href="#checkout-opening" class="btn-small">
+              Get This Lesson – $25
+            </a>
+          </div>
+        </article>
+
+        <!-- VIDEO 2 -->
+        <article class="card">
+          <div class="card-header">
+            <span class="tag">Video Lesson</span>
+            <span class="price">$25</span>
+          </div>
+          <h3>Chess for Beginners: What the Pieces Are &amp; How They Move</h3>
+          <p>
+            If you’re brand new, this is your starting point. Get crystal-clear
+            on each piece, how it moves, and how they work together.
+          </p>
+          <ul class="list">
+            <li>Walkthrough of every piece, including castling and promotion.</li>
+            <li>Common checkmate patterns beginners should recognize.</li>
+            <li>Practical tips on avoiding blunders from move one.</li>
+          </ul>
+          <div class="card-footer">
+            <p class="meta">
+              Format: HD video<br />
+              Level: Absolute beginner
+            </p>
+            <!-- Replace # with your real checkout link -->
+            <a href="#checkout-beginner" class="btn-small">
+              Get This Lesson – $25
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- AI TOOLS SECTION -->
+    <section id="ai-tools">
+      <p class="section-label">AI Training Stack</p>
+      <h2 class="section-title glow">The AI tools I actually use &amp; sell.</h2>
+      <p class="section-sub">
+        I don’t just talk about AI — I use these tools behind the scenes to
+        study smarter, create content, and build digital income streams around
+        chess and education. You can grab the same systems below.
+      </p>
+
+      <div class="ai-grid">
+        <article class="card">
+          <h3>AI Opening Trainer (Prompt Pack)</h3>
+          <p>
+            A set of ready-made prompts you can plug into ChatGPT to analyze
+            your openings, fix your mistakes, and generate custom drills.
+          </p>
+          <ul class="list">
+            <li>Prompts to explain your games in plain language.</li>
+            <li>Opening checklists you can review before you play.</li>
+            <li>Drills that target your exact weak spots.</li>
+          </ul>
+          <div class="ai-pill-row">
+            <span class="ai-pill">Prompt Engineering</span>
+            <span class="ai-pill">Game Review</span>
+            <span class="ai-pill">Custom Drills</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>AI Study Session Generator</h3>
+          <p>
+            Turn 30–60 minutes into a focused, step-by-step study plan using AI
+            so you always know what to work on next.
+          </p>
+          <ul class="list">
+            <li>Structured warm-up, tactics, and review prompts.</li>
+            <li>Session templates for busy people with limited time.</li>
+            <li>Helps you build a repeatable daily training habit.</li>
+          </ul>
+          <div class="ai-pill-row">
+            <span class="ai-pill">Time Management</span>
+            <span class="ai-pill">Daily Routine</span>
+            <span class="ai-pill">Chess + AI</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Content &amp; Income Toolkit</h3>
+          <p>
+            The AI prompts and workflows I use to draft video scripts, titles,
+            and descriptions so my chess content can reach more people online.
+          </p>
+          <ul class="list">
+            <li>Title and thumbnail ideas generated with AI.</li>
+            <li>Scripts and outlines for educational videos.</li>
+            <li>Systems to repurpose one idea into multiple posts.</li>
+          </ul>
+          <div class="ai-pill-row">
+            <span class="ai-pill">YouTube Flow</span>
+            <span class="ai-pill">Script Templates</span>
+            <span class="ai-pill">Repurposing</span>
+          </div>
+        </article>
+      </div>
+
+      <p class="ai-note">
+        These tools are built around how I actually study and build my channel
+        — combining chess, AI, and practical systems that can support your
+        learning and your online projects over time.
+      </p>
+    </section>
+
+    <!-- RESULTS / PROOF -->
+    <section id="proof">
+      <p class="section-label">Real Practice</p>
+      <h2 class="section-title glow">Built from real games, not theory only.</h2>
+
+      <div class="proof">
+        <div class="proof-box">
+          <p>
+            I created this Brain Over Board hub because I wanted one place where
+            everything connects: the YouTube channel, the chess lessons, and the
+            AI workflows I use behind the scenes.
+          </p>
+          <ul class="proof-list">
+            <li>Every lesson is recorded and tested with real players.</li>
+            <li>AI tools are tuned from actual games and mistakes.</li>
+            <li>
+              The system is designed to be simple enough to follow even if
+              you’re busy.
+            </li>
+          </ul>
+          <div class="proof-metric-box">
+            <strong>What this means for you:</strong> fewer random guesses,
+            more clarity, and a cleaner path from “I’m confused by this board”
+            to “I know my plan and why I’m playing this move.”
+          </div>
+        </div>
+
+        <div class="proof-box">
+          <p>
+            As I grow Brain Over Board, I continue to test new AI workflows,
+            refine prompts, and update how I study. The goal: make it easier for
+            you to plug into a system that already works instead of starting
+            from scratch.
+          </p>
+          <ul class="proof-list">
+            <li>Easy to copy and customize AI prompts.</li>
+            <li>Focus on long-term skill and discipline.</li>
+            <li>Aligned with real-life schedules and attention spans.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ + CONTACT -->
+    <section id="contact">
+      <p class="section-label">FAQ &amp; Contact</p>
+      <h2 class="section-title glow">Questions before you grab a lesson?</h2>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>How do I get the videos after I pay?</h4>
+          <p>
+            After checkout, you’ll be sent to a page (and email) with a direct
+            download or private viewing link. You can watch on your phone,
+            tablet, or computer and replay as many times as you want.
+          </p>
+        </div>
+        <div class="faq-item">
+          <h4>Do I need to know anything about chess first?</h4>
+          <p>
+            No. The “Chess for Beginners” video is designed for people who are
+            completely new. The “Three Principles of The Chess Opening” is for
+            when you’re ready to understand why strong players make the moves
+            they do in the opening.
+          </p>
+        </div>
+        <div class="faq-item">
+          <h4>Do I have to use AI tools to benefit?</h4>
+          <p>
+            The videos stand on their own. The AI tools are optional add-ons
+            that show you how I use technology to organize study time, analyze
+            games, and create content around chess.
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <p>
+          Want to connect, ask a question, or talk about coaching and
+          collaborations?
+        </p>
+        <p style="margin-top: 0.4rem;">
+          You can reach me at:
+          <strong>brainoverboardchess@gmail.com</strong>
+          (replace with your real email) or drop a comment on the Brain Over
+          Board YouTube channel and let me know you came from the site.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span>© <span id="year"></span> Brain Over Board. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="#hero">Back to top</a>
+        <!-- Replace with your real YouTube link -->
+        <a href="https://youtube.com" target="_blank" rel="noopener">Visit the YouTube channel</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Set current year automatically
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
